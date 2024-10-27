@@ -30,6 +30,7 @@
     let exitPlay = false;
     let play = false;
     let loop = false;
+    let tileSizeChange = 0;
 
     /**
      * @type {boolean}
@@ -155,6 +156,16 @@
         clearTiles();
         tiles = [];
 
+        if (size <= 70) tileSizeChange = 0;
+        else if (size <= 80 ) tileSizeChange = 1;
+        else if (size <= 90 ) tileSizeChange = 2;
+        else if (size <= 100 ) tileSizeChange = 3;
+        else if (size <= 108 ) tileSizeChange = 4;
+        else if (size <= 116 ) tileSizeChange = 5;
+        else if (size <= 128 ) tileSizeChange = 6;
+        else if (size <= 142 ) tileSizeChange = 7;
+        else if (size <= 156 ) tileSizeChange = 8;
+
         for (let i = 0; i < size; i++){
             for (let j = 0; j < size; j++){
                 tiles.push({
@@ -255,7 +266,7 @@
 
 <div class="board" style="grid-template-columns: repeat({size}, 0fr)" >
     {#each tiles as tile}
-        <Tile x={tile.x} y={tile.y} state={tile.state} color={statesArr.find(e => e.name === tile.state)?.color} gridLines={gridLines} on:coords={handleClick}
+        <Tile tileSizeChange={tileSizeChange} x={tile.x} y={tile.y} state={tile.state} color={statesArr.find(e => e.name === tile.state)?.color} gridLines={gridLines} on:coords={handleClick}
         />
     {/each}
 </div>
@@ -277,7 +288,7 @@
         </button>
         <br />
         Size
-        <input type="number" min="5" max="70" bind:value={size} on:change={updateSize}/>
+        <input type="number" min="5" max="150" bind:value={size} on:change={updateSize}/>
         Speed
         <input class="speed-input" type="number" min="1" max="10" bind:value={speed} />
         Loop
