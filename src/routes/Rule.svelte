@@ -33,7 +33,7 @@
 </script>
 
 <div class="rule">
-    <span>
+    <div>
         <select bind:value={sFrom}>
             {#each sOptions as s}
                 <option value={s}>{s}</option>
@@ -45,9 +45,9 @@
                 <option value={s}>{s}</option>
             {/each}
         </select>
-    </span>
+    </div>
 
-    <div>
+    <div class="check"> 
         {#each [0, 1, 2, 3, 4, 5, 6, 7, 8] as num}
             <label>
                 <input 
@@ -56,7 +56,7 @@
                     bind:group={nums}
                 />
                 <br />
-                <span>{num}</span>
+                <p>{num}</p>
             </label>
         {/each}
         <select bind:value={sNeighbor}>
@@ -71,14 +71,25 @@
 <style>
     .rule{
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
+        margin-bottom: 15px;
     }
     label{
         display: inline-block;
         vertical-align: middle;
     }
-    label span{
+    label p{
         text-align: center;
+        margin-top: 4px;
+    }
+
+    select{
+        border-radius: 2px;
+        font-size: 12pt;
+    }
+
+    .check{
+        margin-top: 12px;
     }
 
 

@@ -26,10 +26,15 @@
     }
 
     let id = 1;
-    let speed = 200;
+    let speed = 1;
     let exitPlay = false;
     let play = false;
     let loop = false;
+
+    /**
+     * @type {boolean}
+     */
+    let gridLines = true;
 
     let selectedState = "off";
 
@@ -55,6 +60,7 @@
         
         tiles = tiles.map(tile => {
             if (tile.x === x && tile.y === y) {
+                if (tile.state === selectedState) return {...tile, state: "off" };
                 return {...tile, state: selectedState };
             }
             return tile;
@@ -206,7 +212,7 @@
                 exitPlay = false;
             }
             else if (recursive){
-                setTimeout(() => updateBoard(recursive), speed);
+                setTimeout(() => updateBoard(recursive), (1000*(1/(speed*10))));
             }
         }
     }
@@ -249,34 +255,42 @@
 
 <div class="board" style="grid-template-columns: repeat({size}, 0fr)" >
     {#each tiles as tile}
-        <Tile x={tile.x} y={tile.y} state={tile.state} color={statesArr.find(e => e.name === tile.state)?.color} on:coords={handleClick}
-            style={ tile.x === size/2 ? "border-color: #004400" : tile.y === size/2 ? "border-color: #440000" : "" }
+        <Tile x={tile.x} y={tile.y} state={tile.state} color={statesArr.find(e => e.name === tile.state)?.color} gridLines={gridLines} on:coords={handleClick}
         />
     {/each}
 </div>
 <div class="controls">
     <!-- MAIN CONTROLS -->
-    <button on:click={() => updateBoard(true)} disabled={play}>
-        Play
-    </button>
-    <button on:click={() => updateBoard(false)} disabled={play}>
-        Step
-    </button>
-    <button on:click={clearTiles} >
-        Clear
-    </button>
-    <button on:click={() => exitPlay = true} disabled={!play}>
-        Pause
-    </button>
-    Size
-    <input type="number" min="5" max="70" bind:value={size} on:change={updateSize}/>
-    Speed
-    <input type="range" min="10" max="1000" bind:value={speed} />
-    Loop
-    <input type="checkbox" bind:checked={loop}/>
+    <div class="main-controls">
+        <h2> Simulation Controls</h2>
+        <button on:click={() => updateBoard(true)} disabled={play}>
+            Play
+        </button>
+        <button on:click={() => updateBoard(false)} disabled={play}>
+            Step
+        </button>
+        <button on:click={clearTiles} >
+            Clear
+        </button>
+        <button on:click={() => exitPlay = true} disabled={!play}>
+            Pause
+        </button>
+        <br />
+        Size
+        <input type="number" min="5" max="70" bind:value={size} on:change={updateSize}/>
+        Speed
+        <input class="speed-input" type="number" min="1" max="10" bind:value={speed} />
+        Loop
+        <input type="checkbox" bind:checked={loop}/>
+        <br />
+        Toggle Grid Lines
+        <input type="checkbox" bind:checked={gridLines}/>
+    </div>
+    
     
     <!-- STATE CONTROLS -->
     <div class="state-controls">
+        <h2>States</h2>
         {#each statesArr as s}
             <input type="radio" value={s.name} bind:group={selectedState}/>
             <State bind:name={s.name} bind:color={s.color}/>
@@ -287,26 +301,48 @@
 
     <!-- RULE CONTROLS -->
     <div class="rule-controls">
+        <h2>Rules</h2>
         {#each rulesArr as r, i}
             <span class="rule-group" id="rules{i}">
                 <button on:click={() => removeRule(r.id)}>
-                    X
+                    &times;
                 </button>
                 <Rule id={r.id} bind:sFrom={r.sFrom} bind:sTo={r.sTo} bind:sNeighbor={r.sNeighbor} bind:sOptions={stateNames} bind:nums={r.nums}/>
             </span>
         {/each}
         <button on:click={addRule}>Add rule</button>
+        <p>
+            Rules define the interactions on the board. It may seem confusing at first, but if you understand the way they are read, it is simple.
+            When loading the page, you start with 2 rules (the rules for Conway's Game of Life). They are read as such:
+            <br />
+            <br />
+            - Turn an OFF tile into a DEFAULT tile if it is surrounded by 3 DEFAULT tiles
+            <br />
+            <br />
+            - Turn a DEFAULT tile into an OFF tile if it is surrounded by 0, 1, 4, 5, 6, 7, or 8 DEFAULT tiles.
+        </p>
     </div>
 </div>
 
 
 <style>
+    *{
+        font-family: 'Courier New', Courier, monospace;
+    }
+
     .board{
         display: grid;
         float: left;
     }
     .controls{
         float: right;
+        margin-right: 10px;
+    }
+
+    @media only screen and (max-width: 1200px){
+        .controls{
+            float: left;
+        }
     }
 
     .state-controls{
@@ -316,4 +352,51 @@
     .rule-group button {
         float:left;
     }
+    button, input{
+        border-radius: 2px;
+        font-weight: bold;
+        font-size: 12pt;
+    }
+
+    .main-controls h2{
+        margin-bottom: 5px;
+    }
+
+    .main-controls button{
+        min-width: 75px;
+    }
+
+    .main-controls input{
+        margin-right: 10px;
+    }
+
+    .rule-group button{
+        font-size: 24px;
+        margin-right: 5px;
+        background: none;
+        color: #FF3333;
+        text-align: center;
+        border: none;
+    }
+
+    .rule-group button:hover{
+        cursor: pointer;
+    }
+
+    .main-controls br{
+        margin-bottom: 12px;
+    }
+
+    .rule-controls p{
+        display: block;
+        max-width: 450px;
+    }
+
+
+    .state-controls button{
+        margin-top: 12px;
+    }
+
+
+
 </style>

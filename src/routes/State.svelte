@@ -19,4 +19,9 @@
     div{
         display: inline-block;
     }
+    input{
+        border-radius: 2px;
+        font-weight: bold;
+        font-size: 12pt;
+    }
 </style>
