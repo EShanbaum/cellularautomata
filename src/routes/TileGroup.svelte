@@ -239,6 +239,7 @@
         rulesArr = [...rulesArr, {id: id++, sFrom: "off", sTo: "off", sNeighbor: "off", nums: []}]
     }
 
+    // @ts-ignore
     function swapRule() {
         
     }
@@ -262,6 +263,49 @@
         rulesArr = newRulesArr;
         console.log(rulesArr);
     }
+
+    function exportGrid(){
+        let sizeJSON = JSON.stringify(size);
+        let gridJSON = JSON.stringify(tiles);
+        let statesJSON = JSON.stringify(statesArr);
+        let rulesJSON = JSON.stringify(rulesArr);
+
+        let blob = new Blob([ "["+sizeJSON, ","+gridJSON, ","+statesJSON, ","+rulesJSON+"]"], {type: "text/plain"});
+        let url = URL.createObjectURL(blob);
+
+        let link = document.createElement("a");
+        link.href = url;
+        link.download = 'cell-auto-grid.txt';
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    async function importGrid(){
+        /**
+         * @type {HTMLInputElement}
+         */
+
+        // @ts-ignore
+        let fileEl = document.getElementById("import-input");
+        // @ts-ignore
+        let file = fileEl.files[0];
+    
+        if (!file) return;
+
+        const text = await file.text();
+        try {
+            size = JSON.parse(text)[0];
+            tiles = JSON.parse(text)[1]
+            statesArr = JSON.parse(text)[2];
+            rulesArr = JSON.parse(text)[3];
+
+        } catch(error) {
+            console.error("Failed to parse grid data:", error);
+        }
+
+        
+    }
+
 </script>
 
 <div class="board" style="grid-template-columns: repeat({size}, 0fr)" >
@@ -271,6 +315,11 @@
     {/each}
 </div>
 <div class="controls">
+    <div class="file-controls">
+        <button on:click={() => document.getElementById("import-input")?.click()}>Import</button>
+        <input id="import-input" type="file" accept=".txt" on:change={importGrid} style="display: none;" />
+        <button on:click={exportGrid}>Export</button>
+    </div>
     <!-- MAIN CONTROLS -->
     <div class="main-controls">
         <h2> Simulation Controls</h2>
